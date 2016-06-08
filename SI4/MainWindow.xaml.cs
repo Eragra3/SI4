@@ -134,11 +134,12 @@ namespace SI4
 
             foreach (var keyPoint in image1Features)
             {
-                DrawPoint(keyPoint.X, keyPoint.Y, Brushes.Red);
+                DrawPoint(keyPoint.X, keyPoint.Y, Brushes.Red, false);
             }
+            return;
             foreach (var keyPoint in image2Features)
             {
-                DrawPoint(keyPoint.X, keyPoint.Y, Brushes.Red);
+                DrawPoint(keyPoint.X, keyPoint.Y, Brushes.Red, false);
             }
 
 
@@ -159,7 +160,7 @@ namespace SI4
             foreach (var keyPoint in keyPointPairs)
             {
                 DrawPoint(keyPoint.X1, keyPoint.Y1, Brushes.Blue);
-                DrawPoint(keyPoint.X2, keyPoint.Y2, Brushes.Blue);
+                DrawPoint(keyPoint.X2, keyPoint.Y2, Brushes.Blue, false);
             }
         }
 
@@ -172,11 +173,20 @@ namespace SI4
         {
             if (topImage)
             {
+                var scale = Image1.ActualWidth / Image1.Source.Width;
+                var scale2 = Image1.ActualHeight / Image1.Source.Height;
+                x *= scale;
+                y *= scale;
+
                 var leftOffset = (Canvas.ActualWidth - Image1.ActualWidth) / 2;
                 x += leftOffset;
             }
             else
             {
+                var scale = Image2.ActualWidth / Image2.Source.Width;
+                x *= scale;
+                y *= scale;
+
                 var leftOffset = (Canvas.ActualWidth - Image2.ActualWidth) / 2;
                 var topOffset = Image1.ActualHeight;
                 x += leftOffset;
@@ -199,11 +209,17 @@ namespace SI4
         {
             var leftOffset1 = (Canvas.ActualWidth - Image1.ActualWidth) / 2;
             x1 += leftOffset1;
+            var scale1 = Image1.ActualWidth / Image1.Source.Width;
+            x1 *= scale1;
+            y1 *= scale1;
 
             var leftOffset2 = (Canvas.ActualWidth - Image2.ActualWidth) / 2;
             var topOffset2 = Image1.ActualHeight;
             x2 += leftOffset2;
             y2 += topOffset2;
+            var scale2 = Image1.ActualWidth / Image1.Source.Width;
+            x2 *= scale2;
+            y2 *= scale2;
 
             var line = new Line()
             {

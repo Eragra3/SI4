@@ -20,8 +20,9 @@ namespace SI4
         public static List<KeyPointsPair> FindKeyPointsPairs(KeyPoint[] image1KeyPoints, KeyPoint[] image2KeyPoints)
         {
             var keyPointsPairs = new List<KeyPointsPair>(image1KeyPoints.Length);
+            object listLock = new object();
 
-            for (var i = 0; i < image1KeyPoints.Length; i++)
+            Parallel.For(0, image1KeyPoints.Length, (i) =>
             {
                 KeyPoint keyPoint1 = image1KeyPoints[i];
 
@@ -40,8 +41,11 @@ namespace SI4
                     }
                 }
 
-                keyPointsPairs.Add(new KeyPointsPair(keyPoint1.X, keyPoint1.Y, keyPoint2.X, keyPoint2.Y));
-            }
+                lock (listLock)
+                {
+                    keyPointsPairs.Add(new KeyPointsPair(keyPoint1.X, keyPoint1.Y, keyPoint2.X, keyPoint2.Y));
+                }
+            });
 
             return keyPointsPairs;
         }
