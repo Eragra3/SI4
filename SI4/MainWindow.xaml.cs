@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -32,9 +33,13 @@ namespace SI4
         private double image2Width = 0;
         private double image2Height = 0;
 
+        private bool _usePerspective = false;
+
         public MainWindow()
         {
             InitializeComponent();
+
+            this.KeyDown += HideCanvasHandler;
 
             FeaturesFile1Path.Text = @"C:\School\AI4\1\castle1.png.haraff.sift";
             UsedImage1Path.Text = @"C:\School\AI4\1\castle1.png";
@@ -51,6 +56,11 @@ namespace SI4
 
             Image1.Source = bi1;
             Image2.Source = bi2;
+
+            NeighboursCount.Text = "100";
+            NeighboursThreshold.Text = "0,5";
+            IterationsCount.Text = "50";
+            MaxError.Text = "10000";
         }
 
         private async void RunAlgorithm(object sender, RoutedEventArgs e)
@@ -114,14 +124,29 @@ namespace SI4
             //    DrawLine(keyPoint.X1, keyPoint.Y1, keyPoint.X2, keyPoint.Y2, Brushes.Yellow);
             //}
 
+            var neighboursCount = int.Parse(NeighboursCount.Text);
+            var neighboursThreshold = double.Parse(NeighboursThreshold.Text.Replace(',', '.'), CultureInfo.InvariantCulture);
+
+
+            var maxError = int.Parse(MaxError.Text);
+            var iterationsCount = int.Parse(IterationsCount.Text);
+
             List<KeyPointsPair> coherentPairs = await Task.Factory.StartNew(() =>
             {
                 switch (UsedAlgorithm)
                 {
                     case AlgorythmTypeEnum.ClosestNeighboor:
-                        return CoherenceAnalysisExecutor.FindCoherentPairs(keyPointPairs, 100, 0.5);
+                        return CoherenceAnalysisExecutor.FindCoherentPairs(
+                            keyPointPairs,
+                            neighboursCount,
+                            neighboursThreshold
+                            );
                     case AlgorythmTypeEnum.Ransac:
-                        return null;
+                        return RansacExecutor.FindCoherentPairs(
+                            keyPointPairs,
+                            maxError,
+                            iterationsCount,
+                            _usePerspective);
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
@@ -207,6 +232,23 @@ namespace SI4
             };
 
             Canvas.Children.Add(line);
+        }
+
+        private void UsePerspective(object sender, RoutedEventArgs e)
+        {
+            _usePerspective = true;
+        }
+
+        private void UseAffine(object sender, RoutedEventArgs e)
+        {
+            _usePerspective = false;
+        }
+
+        private void HideCanvasHandler(object sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.H) return;
+
+            Canvas.Visibility = Canvas.Visibility == Visibility.Hidden ? Visibility.Visible : Visibility.Hidden;
         }
     }
 }

@@ -46,11 +46,34 @@
                 <ComboBoxItem Content="ClosestNeighboor" IsSelected="True"></ComboBoxItem>
                 <ComboBoxItem Content="Ransac"></ComboBoxItem>
             </ComboBox>
-            
+            <StackPanel Orientation="Horizontal">
+                <Label>Neighbours count</Label>
+                <TextBox VerticalAlignment="Center" Width="50" Height="30"
+                    Name="NeighboursCount"></TextBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label>Neighbours threshold</Label>
+                <TextBox VerticalAlignment="Center" Width="50" Height="30"
+                    Name="NeighboursThreshold"></TextBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Iterations count"/>
+                <TextBox VerticalAlignment="Center" Width="50" Height="30"
+                    Name="IterationsCount"></TextBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label>Use perspective transform</Label>
+                <CheckBox VerticalAlignment="Center"
+                    Name="RansackTransformType" Checked="UsePerspective" Unchecked="UseAffine"></CheckBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label>Max transformation error</Label>
+                <TextBox VerticalAlignment="Center" Width="50" Height="30"
+                    Name="MaxError"></TextBox>
+            </StackPanel>
+
             <Button Margin="0,100,0,0" Height="40"
                     Background="HotPink" Click="RunAlgorithm">Run algorithm</Button>
-            <Label>Found pairs:</Label>
-            <TextBox Name="PairsCountTB" Height="30"></TextBox>
         </StackPanel>
 
     </Grid>

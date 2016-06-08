@@ -27,6 +27,11 @@ namespace SI4
             {
                 UsedAlgorithm = AlgorythmTypeEnum.ClosestNeighboor;
             }
+
+            if (RansackTransformType != null)
+            {
+                RansackTransformType.Visibility = UsedAlgorithm == AlgorythmTypeEnum.Ransac ? Visibility.Visible : Visibility.Hidden;
+            }
         }
 
 

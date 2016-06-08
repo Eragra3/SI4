@@ -21,5 +21,10 @@ namespace SI4.Parser
         {
             return (X - kp.X) * (X - kp.X) + (Y - kp.Y) * (Y - kp.Y);
         }
+
+        public double GetDistance(double otherX, double otherY)
+        {
+            return (X - otherX) * (X - otherX) + (Y - otherY) * (Y - otherY);
+        }
     }
 }
