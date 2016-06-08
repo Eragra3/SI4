@@ -46,6 +46,8 @@ namespace SI4
             return keyPointsPairs;
         }
 
+
+        //optimize that
         public static double GetDistance(KeyPoint keyPoint1, KeyPoint keyPoint2)
         {
             var sum = 0;

@@ -13,12 +13,22 @@
             <ColumnDefinition Width="3*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
 
-        <Image Grid.Column="0"></Image>
+        <Grid Grid.Column="0" Panel.ZIndex="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"></RowDefinition>
+                <RowDefinition Height="1*"></RowDefinition>
+            </Grid.RowDefinitions>
+
+            <Image Name="Image1" Grid.Row="0"></Image>
+            <Image Name="Image2"  Grid.Row="1"></Image>
+
+        </Grid>
+        <Canvas Name="Canvas" Grid.Column="0" Panel.ZIndex="2" Background="Transparent"></Canvas>
 
         <StackPanel Grid.Column="1"  Orientation="Vertical">
 
             <TextBox Margin="0,0,0,10" Name="ErrorTextBox" Foreground="Red">Errors</TextBox>
-            
+
             <Label>File 1</Label>
             <TextBox Name="FeaturesFile1Path" IsReadOnly="True" TextWrapping="WrapWithOverflow"></TextBox>
             <Button Click="SetFeaturesFile1">Choose features file</Button>
@@ -32,9 +42,15 @@
             <TextBox Name="UsedImage2Path" IsReadOnly="True" TextWrapping="WrapWithOverflow"></TextBox>
             <Button Click="SetUsedImage2">Choose used image</Button>
 
+            <ComboBox SelectionChanged="ComboBox_SelectionChanged">
+                <ComboBoxItem Content="ClosestNeighboor" IsSelected="True"></ComboBoxItem>
+                <ComboBoxItem Content="Ransac"></ComboBoxItem>
+            </ComboBox>
+            
             <Button Margin="0,100,0,0" Height="40"
                     Background="HotPink" Click="RunAlgorithm">Run algorithm</Button>
-
+            <Label>Found pairs:</Label>
+            <TextBox Name="PairsCountTB" Height="30"></TextBox>
         </StackPanel>
 
     </Grid>
