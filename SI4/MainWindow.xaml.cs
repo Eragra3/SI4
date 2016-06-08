@@ -36,11 +36,11 @@ namespace SI4
         {
             InitializeComponent();
 
-            FeaturesFile1Path.Text = @"C:\School\AI4\1\block1.png.haraff.sift";
-            UsedImage1Path.Text = @"C:\School\AI4\1\block1.png";
+            FeaturesFile1Path.Text = @"C:\School\AI4\1\castle1.png.haraff.sift";
+            UsedImage1Path.Text = @"C:\School\AI4\1\castle1.png";
 
-            FeaturesFile2Path.Text = @"C:\School\AI4\1\block2.png.haraff.sift";
-            UsedImage2Path.Text = @"C:\School\AI4\1\block2.png";
+            FeaturesFile2Path.Text = @"C:\School\AI4\1\castle2.png.haraff.sift";
+            UsedImage2Path.Text = @"C:\School\AI4\1\castle2.png";
 
             BitmapImage bi1 = new BitmapImage(new Uri(UsedImage1Path.Text));
             image1Height = bi1.PixelHeight;
@@ -119,7 +119,7 @@ namespace SI4
                 switch (UsedAlgorithm)
                 {
                     case AlgorythmTypeEnum.ClosestNeighboor:
-                        return CoherenceAnalysisExecutor.FindCoherentPairs(keyPointPairs, 200, 0.8);
+                        return CoherenceAnalysisExecutor.FindCoherentPairs(keyPointPairs, 100, 0.5);
                     case AlgorythmTypeEnum.Ransac:
                         return null;
                     default:

@@ -16,5 +16,10 @@ namespace SI4.Parser
         public double C;
 
         public int[] Features;
+
+        public double GetDistance(KeyPoint kp)
+        {
+            return (X - kp.X) * (X - kp.X) + (Y - kp.Y) * (Y - kp.Y);
+        }
     }
 }

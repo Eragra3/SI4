@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using SI4.Models;
 using SI4.Parser;
-using static SI4.MainExecutor;
 
 namespace SI4.Logic
 {
@@ -29,7 +28,7 @@ namespace SI4.Logic
                 for (int j = 0; j < pairs.Count; j++)
                 {
                     KeyPointsPair p = pairs[j];
-                    double distance = GetDistance(keyPoint1, p.KeyPoint1);
+                    double distance = keyPoint1.GetDistance(p.KeyPoint1);
 
                     if (neighbours1Count < neighboursCount)
                     {
@@ -53,7 +52,7 @@ namespace SI4.Logic
                 for (int j = 0; j < pairs.Count; j++)
                 {
                     KeyPointsPair p = pairs[j];
-                    double distance = GetDistance(keyPoint2, p.KeyPoint2);
+                    double distance = keyPoint2.GetDistance(p.KeyPoint2);
 
                     if (neighbours2Count < neighboursCount)
                     {
