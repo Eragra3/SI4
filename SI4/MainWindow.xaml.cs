@@ -15,6 +15,7 @@ using System.Windows.Navigation;
 using Microsoft.Win32;
 using SI4.Parser;
 using System.Windows.Shapes;
+using SI4.Logic;
 using SI4.Models;
 
 namespace SI4
@@ -35,11 +36,11 @@ namespace SI4
         {
             InitializeComponent();
 
-            FeaturesFile1Path.Text = @"C:\School\AI4\1\castle1.png.haraff.sift";
-            UsedImage1Path.Text = @"C:\School\AI4\1\castle1.png";
+            FeaturesFile1Path.Text = @"C:\School\AI4\1\block1.png.haraff.sift";
+            UsedImage1Path.Text = @"C:\School\AI4\1\block1.png";
 
-            FeaturesFile2Path.Text = @"C:\School\AI4\1\castle2.png.haraff.sift";
-            UsedImage2Path.Text = @"C:\School\AI4\1\castle2.png";
+            FeaturesFile2Path.Text = @"C:\School\AI4\1\block2.png.haraff.sift";
+            UsedImage2Path.Text = @"C:\School\AI4\1\block2.png";
 
             BitmapImage bi1 = new BitmapImage(new Uri(UsedImage1Path.Text));
             image1Height = bi1.PixelHeight;
@@ -52,7 +53,7 @@ namespace SI4
             Image2.Source = bi2;
         }
 
-        private void RunAlgorithm(object sender, RoutedEventArgs e)
+        private async void RunAlgorithm(object sender, RoutedEventArgs e)
         {
             Canvas.Children.Clear();
 
@@ -83,8 +84,10 @@ namespace SI4
                 return;
             }
 
-            KeyPoint[] image1Features = SiftParser.Parse(file1SiftPath);
-            KeyPoint[] image2Features = SiftParser.Parse(file2SiftPath);
+            KeyPoint[] image1Features = await Task.Factory.StartNew(() => SiftParser.Parse(file1SiftPath));
+
+            KeyPoint[] image2Features = await Task.Factory.StartNew(() => SiftParser.Parse(file2SiftPath));
+
 
             Console.WriteLine($"Image 1 features count : {image1Features.Length}");
             Console.WriteLine($"Image 2 features count : {image2Features.Length}");
@@ -100,7 +103,7 @@ namespace SI4
             }
 
 
-            List<KeyPointsPair> keyPointPairs = MainExecutor.FindKeyPointsPairs(image1Features, image2Features);
+            List<KeyPointsPair> keyPointPairs = await Task.Factory.StartNew(() => MainExecutor.FindKeyPointsPairs(image1Features, image2Features));
 
             Console.WriteLine($"Paired points count : {keyPointPairs.Count}");
 
@@ -111,19 +114,28 @@ namespace SI4
             //    DrawLine(keyPoint.X1, keyPoint.Y1, keyPoint.X2, keyPoint.Y2, Brushes.Yellow);
             //}
 
-            List<KeyPointsPair> coherentPairs;
-
-            switch (UsedAlgorithm)
+            List<KeyPointsPair> coherentPairs = await Task.Factory.StartNew(() =>
             {
-                case AlgorythmTypeEnum.ClosestNeighboor:
-                    break;
-                case AlgorythmTypeEnum.Ransac:
-                    keyPointPairs = null;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                switch (UsedAlgorithm)
+                {
+                    case AlgorythmTypeEnum.ClosestNeighboor:
+                        return CoherenceAnalysisExecutor.FindCoherentPairs(keyPointPairs, 200, 0.8);
+                    case AlgorythmTypeEnum.Ransac:
+                        return null;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
             }
+            );
 
+            Console.WriteLine($"Coherent pairs : {coherentPairs.Count}");
+
+            foreach (var pair in coherentPairs)
+            {
+                DrawPoint(pair.KeyPoint1.X, pair.KeyPoint1.Y, Brushes.Blue, true, 2);
+                DrawPoint(pair.KeyPoint2.X, pair.KeyPoint2.Y, Brushes.Blue, false, 2);
+                DrawLine(pair.KeyPoint1.X, pair.KeyPoint1.Y, pair.KeyPoint2.X, pair.KeyPoint2.Y, Brushes.Yellow);
+            }
         }
 
         private void DisplayError(string msg)

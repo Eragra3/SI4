@@ -73,11 +73,7 @@ namespace SI4
                 KeyPoint kp1 = image1KeyPoints[image2ClosestNeighboors[image1ClosestNeighboors[i]]];
                 KeyPoint kp2 = image2KeyPoints[image1ClosestNeighboors[i]];
 
-                keyPointsPairs.Add(new KeyPointsPair(
-                    kp1.X,
-                    kp1.Y,
-                    kp2.X,
-                    kp2.Y));
+                keyPointsPairs.Add(new KeyPointsPair(kp1, kp2));
             }
 
             return keyPointsPairs;

@@ -74,7 +74,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainWindowUIMethods.cs" />
-    <Compile Include="Models\Line.cs" />
+    <Compile Include="Models\KeyPointsPair.cs" />
     <Compile Include="Parser\KeyPoint.cs" />
     <Compile Include="Parser\SiftParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
