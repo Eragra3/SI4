@@ -16,5 +16,6 @@ namespace SI4.Parser
         public double C;
 
         public int[] Features;
+        public int[] Neighbours = new int[20];
     }
 }

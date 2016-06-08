@@ -26,6 +26,11 @@ namespace SI4
     {
         public AlgorythmTypeEnum UsedAlgorithm;
 
+        private double image1Width = 0;
+        private double image1Height = 0;
+        private double image2Width = 0;
+        private double image2Height = 0;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -36,77 +41,26 @@ namespace SI4
             FeaturesFile2Path.Text = @"C:\School\AI4\1\castle2.png.haraff.sift";
             UsedImage2Path.Text = @"C:\School\AI4\1\castle2.png";
 
-            Image1.Source = new BitmapImage(new Uri(UsedImage1Path.Text));
-            Image2.Source = new BitmapImage(new Uri(UsedImage2Path.Text));
-        }
+            BitmapImage bi1 = new BitmapImage(new Uri(UsedImage1Path.Text));
+            image1Height = bi1.PixelHeight;
+            image1Width = bi1.PixelWidth;
+            BitmapImage bi2 = new BitmapImage(new Uri(UsedImage2Path.Text));
+            image2Height = bi2.PixelHeight;
+            image2Width = bi2.PixelWidth;
 
-        private void SetFeaturesFile1(object sender, RoutedEventArgs e)
-        {
-            var dialog = new OpenFileDialog
-            {
-                Filter = "Sift files (*.sift)|*.sift"
-            };
-
-
-            if (!(dialog.ShowDialog() ?? false)) return;
-
-            FeaturesFile1Path.Text = dialog.FileName;
-
-        }
-
-        private void SetUsedImage1(object sender, RoutedEventArgs e)
-        {
-
-            var dialog = new OpenFileDialog
-            {
-                Filter = "Image files (*.png, *.jpg)|*.jpg;*.png"
-            };
-
-
-            if (!(dialog.ShowDialog() ?? false)) return;
-
-            UsedImage1Path.Text = dialog.FileName;
-
-            Image1.Source = new BitmapImage(new Uri(UsedImage1Path.Text));
-        }
-
-        private void SetFeaturesFile2(object sender, RoutedEventArgs e)
-        {
-
-            var dialog = new OpenFileDialog
-            {
-                Filter = "Sift files (*.sift)|*.sift"
-            };
-
-
-            if (!(dialog.ShowDialog() ?? false)) return;
-
-            FeaturesFile2Path.Text = dialog.FileName;
-        }
-
-        private void SetUsedImage2(object sender, RoutedEventArgs e)
-        {
-
-            var dialog = new OpenFileDialog
-            {
-                Filter = "Image files (*.png, *.jpg)|*.jpg;*.png"
-            };
-
-
-            if (!(dialog.ShowDialog() ?? false)) return;
-
-            UsedImage2Path.Text = dialog.FileName;
-
-            Image2.Source = new BitmapImage(new Uri(UsedImage2Path.Text));
+            Image1.Source = bi1;
+            Image2.Source = bi2;
         }
 
         private void RunAlgorithm(object sender, RoutedEventArgs e)
         {
-            var file1Path = UsedImage1Path.Text;
-            var file2Path = UsedImage2Path.Text;
+            Canvas.Children.Clear();
 
-            var file1SiftPath = FeaturesFile1Path.Text;
-            var file2SiftPath = FeaturesFile2Path.Text;
+            string file1Path = UsedImage1Path.Text;
+            string file2Path = UsedImage2Path.Text;
+
+            string file1SiftPath = FeaturesFile1Path.Text;
+            string file2SiftPath = FeaturesFile2Path.Text;
 
             if (!File.Exists(file1Path))
             {
@@ -129,25 +83,39 @@ namespace SI4
                 return;
             }
 
-            var image1Features = SiftParser.Parse(file1SiftPath);
-            var image2Features = SiftParser.Parse(file2SiftPath);
+            KeyPoint[] image1Features = SiftParser.Parse(file1SiftPath);
+            KeyPoint[] image2Features = SiftParser.Parse(file2SiftPath);
+
+            Console.WriteLine($"Image 1 features count : {image1Features.Length}");
+            Console.WriteLine($"Image 2 features count : {image2Features.Length}");
 
             foreach (var keyPoint in image1Features)
             {
-                DrawPoint(keyPoint.X, keyPoint.Y, Brushes.Red, false);
+                DrawPoint(keyPoint.X, keyPoint.Y, Brushes.Red);
             }
-            return;
+
             foreach (var keyPoint in image2Features)
             {
                 DrawPoint(keyPoint.X, keyPoint.Y, Brushes.Red, false);
             }
 
 
-            List<KeyPointsPair> keyPointPairs;
+            List<KeyPointsPair> keyPointPairs = MainExecutor.FindKeyPointsPairs(image1Features, image2Features);
+
+            Console.WriteLine($"Paired points count : {keyPointPairs.Count}");
+
+            //foreach (KeyPointsPair keyPoint in keyPointPairs)
+            //{
+            //    DrawPoint(keyPoint.X1, keyPoint.Y1, Brushes.Blue, true, 2);
+            //    DrawPoint(keyPoint.X2, keyPoint.Y2, Brushes.Blue, false, 2);
+            //    DrawLine(keyPoint.X1, keyPoint.Y1, keyPoint.X2, keyPoint.Y2, Brushes.Yellow);
+            //}
+
+            List<KeyPointsPair> coherentPairs;
+
             switch (UsedAlgorithm)
             {
                 case AlgorythmTypeEnum.ClosestNeighboor:
-                    keyPointPairs = Executor.FindKeyPointsPairs(image1Features, image2Features);
                     break;
                 case AlgorythmTypeEnum.Ransac:
                     keyPointPairs = null;
@@ -156,12 +124,6 @@ namespace SI4
                     throw new ArgumentOutOfRangeException();
             }
 
-
-            foreach (var keyPoint in keyPointPairs)
-            {
-                DrawPoint(keyPoint.X1, keyPoint.Y1, Brushes.Blue);
-                DrawPoint(keyPoint.X2, keyPoint.Y2, Brushes.Blue, false);
-            }
         }
 
         private void DisplayError(string msg)
@@ -169,34 +131,33 @@ namespace SI4
             ErrorTextBox.Text = msg;
         }
 
-        private void DrawPoint(double x, double y, Brush color, bool topImage = true)
+        private void DrawPoint(double x, double y, Brush color, bool topImage = true, int radius = 3)
         {
             if (topImage)
             {
-                var scale = Image1.ActualWidth / Image1.Source.Width;
-                var scale2 = Image1.ActualHeight / Image1.Source.Height;
+                double scale = Image1.ActualWidth / image1Width;
                 x *= scale;
                 y *= scale;
 
-                var leftOffset = (Canvas.ActualWidth - Image1.ActualWidth) / 2;
+                double leftOffset = (Canvas.ActualWidth - Image1.ActualWidth) / 2;
                 x += leftOffset;
             }
             else
             {
-                var scale = Image2.ActualWidth / Image2.Source.Width;
+                double scale = Image2.ActualWidth / image2Width;
                 x *= scale;
                 y *= scale;
 
-                var leftOffset = (Canvas.ActualWidth - Image2.ActualWidth) / 2;
-                var topOffset = Image1.ActualHeight;
+                double leftOffset = (Canvas.ActualWidth - Image2.ActualWidth) / 2;
+                double topOffset = Image1.ActualHeight;
                 x += leftOffset;
                 y += topOffset;
             }
 
-            var circle = new Ellipse()
+            Ellipse circle = new Ellipse()
             {
-                Width = 3,
-                Height = 3,
+                Width = radius,
+                Height = radius,
                 Fill = color
             };
 
@@ -207,21 +168,23 @@ namespace SI4
 
         private void DrawLine(double x1, double y1, double x2, double y2, Brush color)
         {
-            var leftOffset1 = (Canvas.ActualWidth - Image1.ActualWidth) / 2;
-            x1 += leftOffset1;
-            var scale1 = Image1.ActualWidth / Image1.Source.Width;
+            double scale1 = Image1.ActualWidth / image1Width;
             x1 *= scale1;
             y1 *= scale1;
 
-            var leftOffset2 = (Canvas.ActualWidth - Image2.ActualWidth) / 2;
-            var topOffset2 = Image1.ActualHeight;
-            x2 += leftOffset2;
-            y2 += topOffset2;
-            var scale2 = Image1.ActualWidth / Image1.Source.Width;
+            double leftOffset1 = (Canvas.ActualWidth - Image1.ActualWidth) / 2;
+            x1 += leftOffset1;
+
+            double scale2 = Image2.ActualWidth / image2Width;
             x2 *= scale2;
             y2 *= scale2;
 
-            var line = new Line()
+            double leftOffset2 = (Canvas.ActualWidth - Image2.ActualWidth) / 2;
+            double topOffset2 = Image1.ActualHeight;
+            x2 += leftOffset2;
+            y2 += topOffset2;
+
+            Line line = new Line()
             {
                 X1 = x1,
                 Y1 = y1,
@@ -232,26 +195,6 @@ namespace SI4
             };
 
             Canvas.Children.Add(line);
-        }
-
-        public void Update()
-        {
-        }
-
-        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            try
-            {
-                var usedAlgorithmText = ((ComboBoxItem)e.AddedItems[0]).Content.ToString();
-                if (string.IsNullOrEmpty(usedAlgorithmText))
-                    UsedAlgorithm = AlgorythmTypeEnum.ClosestNeighboor;
-                else
-                    UsedAlgorithm = (AlgorythmTypeEnum)Enum.Parse(typeof(AlgorythmTypeEnum), usedAlgorithmText);
-            }
-            catch (Exception)
-            {
-                UsedAlgorithm = AlgorythmTypeEnum.ClosestNeighboor;
-            }
         }
     }
 }

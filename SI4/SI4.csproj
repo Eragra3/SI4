@@ -65,13 +65,15 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Configuration.cs" />
-    <Compile Include="Executor.cs" />
+    <Compile Include="Logic\CoherenceAnalysisExecutor.cs" />
+    <Compile Include="Logic\MainExecutor.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MainWindowUIMethods.cs" />
     <Compile Include="Models\Line.cs" />
     <Compile Include="Parser\KeyPoint.cs" />
     <Compile Include="Parser\SiftParser.cs" />

@@ -15,31 +15,31 @@ namespace SI4.Parser
         {
 
             KeyPoint[] keyPoints;
-            using (var sr = new StreamReader(path))
+            using (StreamReader sr = new StreamReader(path))
             {
-                var featuresCountText = sr.ReadLine();
-                var featuresCount = int.Parse(featuresCountText);
-                var keyPointsCountText = sr.ReadLine();
-                var keyPointsCount = int.Parse(keyPointsCountText);
+                string featuresCountText = sr.ReadLine();
+                int featuresCount = int.Parse(featuresCountText);
+                string keyPointsCountText = sr.ReadLine();
+                int keyPointsCount = int.Parse(keyPointsCountText);
 
                 keyPoints = new KeyPoint[keyPointsCount];
 
                 string readedLine;
-                var counter = 0;
+                int counter = 0;
                 while ((readedLine = sr.ReadLine()) != null)
                 {
-                    var splittedLine = readedLine.Split(' ');
+                    string[] splittedLine = readedLine.Split(' ');
 
-                    var x = double.Parse(splittedLine[0], CultureInfo.InvariantCulture);
-                    var y = double.Parse(splittedLine[1], CultureInfo.InvariantCulture);
+                    double x = double.Parse(splittedLine[0], CultureInfo.InvariantCulture);
+                    double y = double.Parse(splittedLine[1], CultureInfo.InvariantCulture);
 
-                    var paramA = double.Parse(splittedLine[2], CultureInfo.InvariantCulture);
-                    var paramB = double.Parse(splittedLine[3], CultureInfo.InvariantCulture);
-                    var paramC = double.Parse(splittedLine[4], CultureInfo.InvariantCulture);
+                    double paramA = double.Parse(splittedLine[2], CultureInfo.InvariantCulture);
+                    double paramB = double.Parse(splittedLine[3], CultureInfo.InvariantCulture);
+                    double paramC = double.Parse(splittedLine[4], CultureInfo.InvariantCulture);
 
-                    var features = new int[featuresCount];
+                    int[] features = new int[featuresCount];
 
-                    for (var i = 0; i < features.Length; i++)
+                    for (int i = 0; i < features.Length; i++)
                     {
                         features[i] = int.Parse(splittedLine[i +5]);
                     }
