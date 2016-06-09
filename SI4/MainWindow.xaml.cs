@@ -58,9 +58,9 @@ namespace SI4
             Image2.Source = bi2;
 
             NeighboursCount.Text = "100";
-            NeighboursThreshold.Text = "0,5";
-            IterationsCount.Text = "50";
-            MaxError.Text = "10000";
+            NeighboursThreshold.Text = "0,6";
+            IterationsCount.Text = "25";
+            MaxError.Text = "100";
         }
 
         private async void RunAlgorithm(object sender, RoutedEventArgs e)
@@ -131,6 +131,9 @@ namespace SI4
             var maxError = int.Parse(MaxError.Text);
             var iterationsCount = int.Parse(IterationsCount.Text);
 
+            var useKeyPointPickingHeuristic = KeyPointsPickingHeuristic.IsChecked != null &&
+                                              KeyPointsPickingHeuristic.IsChecked.Value;
+
             List<KeyPointsPair> coherentPairs = await Task.Factory.StartNew(() =>
             {
                 switch (UsedAlgorithm)
@@ -146,7 +149,10 @@ namespace SI4
                             keyPointPairs,
                             maxError,
                             iterationsCount,
-                            _usePerspective);
+                            _usePerspective,
+                            useKeyPointPickingHeuristic,
+                            0.01 * image1Width * 0.01 * image1Width,
+                            0.3 * image1Width * 0.3 * image1Width);
                     default:
                         throw new ArgumentOutOfRangeException();
                 }

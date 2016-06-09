@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:SI4"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
-        Title="MainWindow" Height="700" Width="1000" ResizeMode="NoResize">
+        Title="MainWindow" Height="1000" Width="1400" ResizeMode="NoResize">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="7*"></ColumnDefinition>
@@ -65,6 +65,11 @@
                 <Label>Use perspective transform</Label>
                 <CheckBox VerticalAlignment="Center"
                     Name="RansackTransformType" Checked="UsePerspective" Unchecked="UseAffine"></CheckBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label>Use points picking heuristic</Label>
+                <CheckBox VerticalAlignment="Center"
+                    Name="KeyPointsPickingHeuristic"></CheckBox>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <Label>Max transformation error</Label>

@@ -29,9 +29,12 @@ namespace SI4.Logic
         }
 
 
-        public static List<KeyPointsPair> FindCoherentPairs(List<KeyPointsPair> pairs, int maxError, int iterationsCount = 50, bool usePerspectiveTransform = false)
+        public static List<KeyPointsPair> FindCoherentPairs(List<KeyPointsPair> pairs, int maxError, int iterationsCount = 50, bool usePerspectiveTransform = false, bool useClosePointsHeuristic = false, double r = 10.0, double R = 300.0)
         {
             List<KeyPointsPair> coherentPairs = new List<KeyPointsPair>();
+
+            var rSquare = r * r;
+            var RSquare = R * R;
 
             object lockObject = new object();
             int samplesCount = usePerspectiveTransform ? 4 : 3;
@@ -53,13 +56,105 @@ namespace SI4.Logic
 
                         KeyPointsPair randomPair;
 
-                        for (int k = 0; k < samplesCount; k++)
+                        if (!useClosePointsHeuristic)
                         {
+                            for (int k = 0; k < samplesCount; k++)
+                            {
+                                do
+                                {
+                                    randomPair = pairs[Rng.Next(0, pairs.Count)];
+                                } while (sampleKeyPoints.Contains(randomPair));
+                                sampleKeyPoints.Add(randomPair);
+                            }
+                        }
+                        else
+                        {
+                            sampleKeyPoints.Add(pairs[Rng.Next(0, pairs.Count)]);
+                            var x1 = sampleKeyPoints[0].KeyPoint1.X;
+                            var y1 = sampleKeyPoints[0].KeyPoint1.Y;
+                            var u1 = sampleKeyPoints[0].KeyPoint2.X;
+                            var v1 = sampleKeyPoints[0].KeyPoint2.Y;
                             do
                             {
                                 randomPair = pairs[Rng.Next(0, pairs.Count)];
-                            } while (sampleKeyPoints.Contains(randomPair));
+                            } while (sampleKeyPoints.Contains(randomPair) ||
+                                (x1 - randomPair.KeyPoint1.X) * (x1 - randomPair.KeyPoint1.X) +
+                                (y1 - randomPair.KeyPoint1.Y) * (y1 - randomPair.KeyPoint1.Y) < rSquare ||
+                                (x1 - randomPair.KeyPoint1.X) * (x1 - randomPair.KeyPoint1.X) +
+                                (y1 - randomPair.KeyPoint1.Y) * (y1 - randomPair.KeyPoint1.Y) > RSquare ||
+                                (u1 - randomPair.KeyPoint2.X) * (u1 - randomPair.KeyPoint2.X) +
+                                (v1 - randomPair.KeyPoint2.Y) * (v1 - randomPair.KeyPoint2.Y) < rSquare ||
+                                (u1 - randomPair.KeyPoint2.X) * (u1 - randomPair.KeyPoint2.X) +
+                                (v1 - randomPair.KeyPoint2.Y) * (v1 - randomPair.KeyPoint2.Y) > RSquare
+                            );
                             sampleKeyPoints.Add(randomPair);
+                            var x2 = sampleKeyPoints[1].KeyPoint1.X;
+                            var y2 = sampleKeyPoints[1].KeyPoint1.Y;
+                            var u2 = sampleKeyPoints[1].KeyPoint2.X;
+                            var v2 = sampleKeyPoints[1].KeyPoint2.Y;
+                            do
+                            {
+                                randomPair = pairs[Rng.Next(0, pairs.Count)];
+                            } while (sampleKeyPoints.Contains(randomPair) ||
+                                (x1 - randomPair.KeyPoint1.X) * (x1 - randomPair.KeyPoint1.X) +
+                                (y1 - randomPair.KeyPoint1.Y) * (y1 - randomPair.KeyPoint1.Y) < rSquare ||
+                                (x1 - randomPair.KeyPoint1.X) * (x1 - randomPair.KeyPoint1.X) +
+                                (y1 - randomPair.KeyPoint1.Y) * (y1 - randomPair.KeyPoint1.Y) > RSquare ||
+                                (u1 - randomPair.KeyPoint2.X) * (u1 - randomPair.KeyPoint2.X) +
+                                (v1 - randomPair.KeyPoint2.Y) * (v1 - randomPair.KeyPoint2.Y) < rSquare ||
+                                (u1 - randomPair.KeyPoint2.X) * (u1 - randomPair.KeyPoint2.X) +
+                                (v1 - randomPair.KeyPoint2.Y) * (v1 - randomPair.KeyPoint2.Y) > RSquare ||
+
+                                (x2 - randomPair.KeyPoint1.X) * (x2 - randomPair.KeyPoint1.X) +
+                                (y2 - randomPair.KeyPoint1.Y) * (y2 - randomPair.KeyPoint1.Y) < rSquare ||
+                                (x2 - randomPair.KeyPoint1.X) * (x2 - randomPair.KeyPoint1.X) +
+                                (y2 - randomPair.KeyPoint1.Y) * (y2 - randomPair.KeyPoint1.Y) > RSquare ||
+                                (u2 - randomPair.KeyPoint2.X) * (u2 - randomPair.KeyPoint2.X) +
+                                (v2 - randomPair.KeyPoint2.Y) * (v2 - randomPair.KeyPoint2.Y) < rSquare ||
+                                (u2 - randomPair.KeyPoint2.X) * (u2 - randomPair.KeyPoint2.X) +
+                                (v2 - randomPair.KeyPoint2.Y) * (v2 - randomPair.KeyPoint2.Y) > RSquare
+                            );
+                            sampleKeyPoints.Add(randomPair);
+                            var x3 = sampleKeyPoints[2].KeyPoint1.X;
+                            var y3 = sampleKeyPoints[2].KeyPoint1.Y;
+                            var u3 = sampleKeyPoints[2].KeyPoint2.X;
+                            var v3 = sampleKeyPoints[2].KeyPoint2.Y;
+
+                            if (usePerspectiveTransform)
+                            {
+                                do
+                                {
+                                    randomPair = pairs[Rng.Next(0, pairs.Count)];
+                                } while (sampleKeyPoints.Contains(randomPair) ||
+                                    (x1 - randomPair.KeyPoint1.X) * (x1 - randomPair.KeyPoint1.X) +
+                                    (y1 - randomPair.KeyPoint1.Y) * (y1 - randomPair.KeyPoint1.Y) < rSquare ||
+                                    (x1 - randomPair.KeyPoint1.X) * (x1 - randomPair.KeyPoint1.X) +
+                                    (y1 - randomPair.KeyPoint1.Y) * (y1 - randomPair.KeyPoint1.Y) > RSquare ||
+                                    (u1 - randomPair.KeyPoint2.X) * (u1 - randomPair.KeyPoint2.X) +
+                                    (v1 - randomPair.KeyPoint2.Y) * (v1 - randomPair.KeyPoint2.Y) < rSquare ||
+                                    (u1 - randomPair.KeyPoint2.X) * (u1 - randomPair.KeyPoint2.X) +
+                                    (v1 - randomPair.KeyPoint2.Y) * (v1 - randomPair.KeyPoint2.Y) > RSquare ||
+
+                                    (x2 - randomPair.KeyPoint1.X) * (x2 - randomPair.KeyPoint1.X) +
+                                    (y2 - randomPair.KeyPoint1.Y) * (y2 - randomPair.KeyPoint1.Y) < rSquare ||
+                                    (x2 - randomPair.KeyPoint1.X) * (x2 - randomPair.KeyPoint1.X) +
+                                    (y2 - randomPair.KeyPoint1.Y) * (y2 - randomPair.KeyPoint1.Y) > RSquare ||
+                                    (u2 - randomPair.KeyPoint2.X) * (u2 - randomPair.KeyPoint2.X) +
+                                    (v2 - randomPair.KeyPoint2.Y) * (v2 - randomPair.KeyPoint2.Y) < rSquare ||
+                                    (u2 - randomPair.KeyPoint2.X) * (u2 - randomPair.KeyPoint2.X) +
+                                    (v2 - randomPair.KeyPoint2.Y) * (v2 - randomPair.KeyPoint2.Y) > RSquare ||
+
+                                    (x3 - randomPair.KeyPoint1.X) * (x3 - randomPair.KeyPoint1.X) +
+                                    (y3 - randomPair.KeyPoint1.Y) * (y3 - randomPair.KeyPoint1.Y) < rSquare ||
+                                    (x3 - randomPair.KeyPoint1.X) * (x3 - randomPair.KeyPoint1.X) +
+                                    (y3 - randomPair.KeyPoint1.Y) * (y3 - randomPair.KeyPoint1.Y) > RSquare ||
+                                    (u3 - randomPair.KeyPoint2.X) * (u3 - randomPair.KeyPoint2.X) +
+                                    (v3 - randomPair.KeyPoint2.Y) * (v3 - randomPair.KeyPoint2.Y) < rSquare ||
+                                    (u3 - randomPair.KeyPoint2.X) * (u3 - randomPair.KeyPoint2.X) +
+                                    (v3 - randomPair.KeyPoint2.Y) * (v3 - randomPair.KeyPoint2.Y) > RSquare
+                                );
+                                sampleKeyPoints.Add(randomPair);
+                            }
                         }
 
                         if (usePerspectiveTransform)
@@ -110,11 +205,10 @@ namespace SI4.Logic
 
         public static double GetError(Matrix<double> transformationMatrix, KeyPointsPair pair)
         {
-            Matrix<double> point1 = Matrix.Build.Dense(3, 1);
+            Matrix<double> point1 = Matrix.Build.Dense(3, 1, 1);
 
             point1[0, 0] = pair.KeyPoint1.X;
             point1[1, 0] = pair.KeyPoint1.Y;
-            point1[2, 0] = 1;
 
             Matrix<double> projectedPoint = transformationMatrix.Multiply(point1);
 
